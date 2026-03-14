@@ -335,9 +335,11 @@ class StreamAC(BaseInternalDevice):
                     if packet.msg.cmd_id > 0:
                         self._parsedata(packet, stream_ac2.StreamACChamp_cmd21(), raw)
 
-                    # paquet Champ_cmd21_2
+                    # paquet Champ_cmd21_2 (nested inside Champ_cmd21)
                     if packet.msg.cmd_id > 0:
-                        self._parsedata(packet, stream_ac2.StreamACChamp_cmd21_2(), raw)
+                        cmd21 = stream_ac2.StreamACChamp_cmd21()
+                        cmd21.ParseFromString(packet.msg.pdata)
+                        self._parsescalars(cmd21.Champ_cmd21_champ_cmd21_2, raw)
 
                     # paquet Champ_cmd21_3
                     if packet.msg.cmd_id > 0:
@@ -371,6 +373,17 @@ class StreamAC(BaseInternalDevice):
                 str(raw_data.hex()),
             )
         return raw
+
+    def _parsescalars(self, content, raw):
+        try:
+            for descriptor in content.DESCRIPTOR.fields:
+                if descriptor.message_type is not None:
+                    continue
+                value = getattr(content, descriptor.name)
+                if value != 0:
+                    raw["params"][descriptor.name] = value
+        except Exception as error:
+            _LOGGER.debug(error)
 
     def _parsedata(self, packet, content, raw):
         try:
