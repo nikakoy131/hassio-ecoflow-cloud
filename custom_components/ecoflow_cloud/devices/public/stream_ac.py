@@ -221,7 +221,7 @@ class StreamAC(BaseDevice):
             # "seriesConnectDeviceId": 1,
             # "seriesConnectDeviceStatus": "MASTER",
             # "soc": 46,
-            LevelSensorEntity(client, self, "soc", const.STREAM_POWER_BATTERY)
+            LevelSensorEntity(client, self, "soc", const.STREAM_POWER_BATTERY_SOC)
             .attr("designCap", const.ATTR_DESIGN_CAPACITY, 0)
             .attr("fullCap", const.ATTR_FULL_CAPACITY, 0)
             .attr("remainCap", const.ATTR_REMAIN_CAPACITY, 0),
