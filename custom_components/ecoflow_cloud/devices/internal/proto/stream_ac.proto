@@ -168,7 +168,7 @@ message StreamACChamp_cmd21_2 {
     optional uint32 Champ_cmd21_2_field4 = 4;
     optional uint32 Champ_cmd21_2_field5 = 5;
     optional uint32 Champ_cmd21_2_field8 = 8;
-    optional uint32 Champ_cmd21_2_field9 = 9;
+    optional uint32 soc = 9;
     optional uint32 Champ_cmd21_2_field10 = 10;
     optional uint32 Champ_cmd21_2_field11 = 11;
     optional uint32 Champ_cmd21_2_field16 = 16;

@@ -109,7 +109,7 @@ class StreamAC(BaseInternalDevice):
             # "energyStrategyOperateMode.operateSelfPoweredOpen": true,
             # "energyStrategyOperateMode.operateTouModeOpen": false,
             # "f32ShowSoc": 46.317574,
-            LevelSensorEntity(client, self, "f32ShowSoc", const.STREAM_POWER_BATTERY_SOC, False),
+            LevelSensorEntity(client, self, "f32ShowSoc", const.STREAM_POWER_BATTERY_SOC),
             # "feedGridMode": 2,
             # "feedGridModePowLimit": 800,
             # "feedGridModePowMax": 800,
@@ -334,6 +334,10 @@ class StreamAC(BaseInternalDevice):
                     # paquet Champ_cmd21
                     if packet.msg.cmd_id > 0:
                         self._parsedata(packet, stream_ac2.StreamACChamp_cmd21(), raw)
+
+                    # paquet Champ_cmd21_2
+                    if packet.msg.cmd_id > 0:
+                        self._parsedata(packet, stream_ac2.StreamACChamp_cmd21_2(), raw)
 
                     # paquet Champ_cmd21_3
                     if packet.msg.cmd_id > 0:

@@ -303,14 +303,14 @@ class StreamACChamp_cmd21_3(_message.Message):
     def __init__(self, Champ_cmd21_3_field282: _Optional[int] = ..., Champ_cmd21_3_field460: _Optional[int] = ..., powGetSysGrid: _Optional[float] = ..., powGetSysLoad: _Optional[float] = ..., powGetPvSum: _Optional[float] = ..., powGetBpCms: _Optional[float] = ..., Champ_cmd21_3_field602: _Optional[float] = ..., gridConnectionPower: _Optional[float] = ..., cloudMetter: _Optional[_Union[StreamACCloudMeter, _Mapping]] = ..., sysGridConnectionPower: _Optional[float] = ..., powGetSysLoadFromBp: _Optional[float] = ..., powGetSysLoadFromGrid: _Optional[float] = ..., powGetSchuko1: _Optional[float] = ...) -> None: ...
 
 class StreamACChamp_cmd21_2(_message.Message):
-    __slots__ = ("Champ_cmd21_2_champ_cmd21_3", "Champ_cmd21_2_field2", "Champ_cmd21_2_field3", "Champ_cmd21_2_field4", "Champ_cmd21_2_field5", "Champ_cmd21_2_field8", "Champ_cmd21_2_field9", "Champ_cmd21_2_field10", "Champ_cmd21_2_field11", "Champ_cmd21_2_field16", "Champ_cmd21_2_field17")
+    __slots__ = ("Champ_cmd21_2_champ_cmd21_3", "Champ_cmd21_2_field2", "Champ_cmd21_2_field3", "Champ_cmd21_2_field4", "Champ_cmd21_2_field5", "Champ_cmd21_2_field8", "soc", "Champ_cmd21_2_field10", "Champ_cmd21_2_field11", "Champ_cmd21_2_field16", "Champ_cmd21_2_field17")
     CHAMP_CMD21_2_CHAMP_CMD21_3_FIELD_NUMBER: _ClassVar[int]
     CHAMP_CMD21_2_FIELD2_FIELD_NUMBER: _ClassVar[int]
     CHAMP_CMD21_2_FIELD3_FIELD_NUMBER: _ClassVar[int]
     CHAMP_CMD21_2_FIELD4_FIELD_NUMBER: _ClassVar[int]
     CHAMP_CMD21_2_FIELD5_FIELD_NUMBER: _ClassVar[int]
     CHAMP_CMD21_2_FIELD8_FIELD_NUMBER: _ClassVar[int]
-    CHAMP_CMD21_2_FIELD9_FIELD_NUMBER: _ClassVar[int]
+    SOC_FIELD_NUMBER: _ClassVar[int]
     CHAMP_CMD21_2_FIELD10_FIELD_NUMBER: _ClassVar[int]
     CHAMP_CMD21_2_FIELD11_FIELD_NUMBER: _ClassVar[int]
     CHAMP_CMD21_2_FIELD16_FIELD_NUMBER: _ClassVar[int]
@@ -321,12 +321,12 @@ class StreamACChamp_cmd21_2(_message.Message):
     Champ_cmd21_2_field4: int
     Champ_cmd21_2_field5: int
     Champ_cmd21_2_field8: int
-    Champ_cmd21_2_field9: int
+    soc: int
     Champ_cmd21_2_field10: int
     Champ_cmd21_2_field11: int
     Champ_cmd21_2_field16: int
     Champ_cmd21_2_field17: int
-    def __init__(self, Champ_cmd21_2_champ_cmd21_3: _Optional[_Union[StreamACChamp_cmd21_3, _Mapping]] = ..., Champ_cmd21_2_field2: _Optional[int] = ..., Champ_cmd21_2_field3: _Optional[int] = ..., Champ_cmd21_2_field4: _Optional[int] = ..., Champ_cmd21_2_field5: _Optional[int] = ..., Champ_cmd21_2_field8: _Optional[int] = ..., Champ_cmd21_2_field9: _Optional[int] = ..., Champ_cmd21_2_field10: _Optional[int] = ..., Champ_cmd21_2_field11: _Optional[int] = ..., Champ_cmd21_2_field16: _Optional[int] = ..., Champ_cmd21_2_field17: _Optional[int] = ...) -> None: ...
+    def __init__(self, Champ_cmd21_2_champ_cmd21_3: _Optional[_Union[StreamACChamp_cmd21_3, _Mapping]] = ..., Champ_cmd21_2_field2: _Optional[int] = ..., Champ_cmd21_2_field3: _Optional[int] = ..., Champ_cmd21_2_field4: _Optional[int] = ..., Champ_cmd21_2_field5: _Optional[int] = ..., Champ_cmd21_2_field8: _Optional[int] = ..., soc: _Optional[int] = ..., Champ_cmd21_2_field10: _Optional[int] = ..., Champ_cmd21_2_field11: _Optional[int] = ..., Champ_cmd21_2_field16: _Optional[int] = ..., Champ_cmd21_2_field17: _Optional[int] = ...) -> None: ...
 
 class StreamACChamp_cmd21(_message.Message):
     __slots__ = ("Champ_cmd21_champ_cmd21_2",)
