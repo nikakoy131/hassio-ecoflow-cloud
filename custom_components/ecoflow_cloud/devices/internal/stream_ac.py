@@ -1234,8 +1234,9 @@ class StreamAC(BaseInternalDevice):
                     # parses below re-read the same pdata as unrelated message
                     # types and overwrite the "Champ_cmd21_2_field*" keys with
                     # garbage, so the canonical keys have to be pinned first.
+                    bare_battery_frame = False
                     if packet.msg.cmd_id > 0:
-                        champ_cmd21_2 = self._extract_champ_cmd21_2(packet, stream_ac2)
+                        champ_cmd21_2, bare_battery_frame = self._extract_champ_cmd21_2(packet, stream_ac2)
                         if champ_cmd21_2 is not None:
                             self._store_fields(champ_cmd21_2, raw)
                             self._normalize_champ_fields(raw["params"])
@@ -1252,7 +1253,15 @@ class StreamAC(BaseInternalDevice):
                     if packet.msg.cmd_id > 0:
                         self._parsedata(packet, stream_ac2.StreamACChamp_cmd50_3(), raw)
 
-                    self._decode_manual_fields(packet.msg.pdata, raw)
+                    # _decode_manual_fields() walks the top level of pdata by
+                    # raw field number, which only means what _MANUAL_FIELD_MAP
+                    # says on the big DisplayPropertyUpload frame. On a bare
+                    # Champ_cmd21_2 frame the same numbers address completely
+                    # different leaves - field 6 there is not f32ShowSoc and
+                    # reads 0 - so scanning it would overwrite the SoC decoded
+                    # above with a bogus 0 every time such a frame arrives.
+                    if not bare_battery_frame:
+                        self._decode_manual_fields(packet.msg.pdata, raw)
 
                     _LOGGER.info("Found %u fields", len(raw["params"]))
 
@@ -1310,8 +1319,8 @@ class StreamAC(BaseInternalDevice):
         "Champ_cmd21_2_field21",  # cmsMinDsgSoc
     )
 
-    def _extract_champ_cmd21_2(self, packet, stream_ac2):
-        """Return the Champ_cmd21_2 message a frame carries, or None.
+    def _extract_champ_cmd21_2(self, packet, stream_ac2) -> tuple[Any, bool]:
+        """Return ``(message, is_bare)`` for the Champ_cmd21_2 a frame carries.
 
         Stream AC / Ultra / Ultra X wrap it in Champ_cmd21 as field 1, but
         Stream Pro emits it bare - the whole pdata *is* the Champ_cmd21_2, with
@@ -1323,33 +1332,37 @@ class StreamAC(BaseInternalDevice):
         both candidates are sanity-checked before being trusted: an unrelated
         frame reinterpreted under this schema nearly always lands outside 0-100
         on at least one percentage leaf.
+
+        ``is_bare`` tells the caller the frame's top level is a Champ_cmd21_2,
+        which changes what its raw field numbers mean - see the
+        _decode_manual_fields() call site.
         """
         pdata = getattr(packet.msg, "pdata", b"")
         if not pdata:
-            return None
+            return None, False
 
-        candidates = []
+        candidates: list[tuple[Any, bool]] = []
 
         try:
             wrapped = stream_ac2.StreamACChamp_cmd21()
             wrapped.ParseFromString(pdata)
             if wrapped.HasField("Champ_cmd21_champ_cmd21_2"):
-                candidates.append(wrapped.Champ_cmd21_champ_cmd21_2)
+                candidates.append((wrapped.Champ_cmd21_champ_cmd21_2, False))
         except Exception as error:
             _LOGGER.debug(error)
 
         try:
             bare = stream_ac2.StreamACChamp_cmd21_2()
             bare.ParseFromString(pdata)
-            candidates.append(bare)
+            candidates.append((bare, True))
         except Exception as error:
             _LOGGER.debug(error)
 
-        for candidate in candidates:
+        for candidate, is_bare in candidates:
             if self._looks_like_battery_telemetry(candidate):
-                return candidate
+                return candidate, is_bare
 
-        return None
+        return None, False
 
     @classmethod
     def _looks_like_battery_telemetry(cls, msg) -> bool:
