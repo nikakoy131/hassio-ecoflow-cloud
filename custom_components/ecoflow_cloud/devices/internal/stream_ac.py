@@ -20,6 +20,7 @@ from custom_components.ecoflow_cloud.sensor import (
     CyclesSensorEntity,
     EnergySensorEntity,
     FrequencySensorEntity,
+    InAmpSensorEntity,
     MiscSensorEntity,
     InWattsSensorEntity,
     LevelSensorEntity,
@@ -49,7 +50,11 @@ class StreamGridStateSensorEntity(MiscSensorEntity):
     _attr_icon = "mdi:transmission-tower"
 
     def _update_value(self, val: Any) -> bool:
-        return super()._update_value(_GRID_STA.get(int(val), f"unknown_{val}"))
+        try:
+            sta = int(val)
+        except (TypeError, ValueError):
+            return False
+        return super()._update_value(_GRID_STA.get(sta, f"unknown_{sta}"))
 
 
 class StreamGridConnectedBinarySensorEntity(MiscBinarySensorEntity):
@@ -240,6 +245,7 @@ class StreamAC(BaseInternalDevice):
             # "gridConnectionSta": "PANEL_GRID_IN",
             # "gridConnectionVol": 235.34576,
             VoltSensorEntity(client, self, "gridConnectionVol", const.STREAM_POWER_VOL),
+            InAmpSensorEntity(client, self, "gridConnectionAmp", const.STREAM_POWER_AMP, False),
             # "gridConnectionFreq" / "gridConnectionSta" (field 615 / 619)
             FrequencySensorEntity(client, self, "gridConnectionFreq", const.STREAM_GRID_FREQ, False),
             StreamGridStateSensorEntity(client, self, "gridConnectionSta", const.STREAM_GRID_STATE),
