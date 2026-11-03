@@ -164,7 +164,14 @@ message StreamACChamp_cmd21_3 {
     optional float powGetPvSum = 517; // pv sum
     optional float powGetBpCms = 518;
     optional float Champ_cmd21_3_field602 = 602;
+    // Grid connection telemetry. Field numbers shared with the BK-series
+    // DisplayPropertyUpload (see ef_bk_series.proto, which confirms 616 too).
+    optional float gridConnectionVol = 613;
+    optional float gridConnectionAmp = 614;
+    optional float gridConnectionFreq = 615;
     optional float gridConnectionPower = 616;
+    // 0=NO_VALID, 1=PANEL_GRID_IN, 2=PANEL_GRID_NOT_ONLINE, 3=PANEL_FEED_GRID
+    optional uint32 gridConnectionSta = 619;
     optional StreamACCloudMeter cloudMetter = 785;
     optional float sysGridConnectionPower = 992;
     optional float powGetPv3 = 996; // pv3 power

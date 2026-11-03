@@ -2,6 +2,7 @@ from typing import override
 from typing import Any
 import logging
 
+from homeassistant.components.binary_sensor import BinarySensorDeviceClass, BinarySensorEntity
 from homeassistant.components.number import NumberEntity
 from homeassistant.components.select import SelectEntity
 from homeassistant.components.sensor import SensorEntity
@@ -9,6 +10,7 @@ from homeassistant.components.switch import SwitchEntity
 from homeassistant.util import utcnow
 
 from custom_components.ecoflow_cloud.api import EcoflowApiClient
+from custom_components.ecoflow_cloud.binary_sensor import MiscBinarySensorEntity
 from custom_components.ecoflow_cloud.devices import BaseInternalDevice, const
 from custom_components.ecoflow_cloud.sensor import (
     AmpSensorEntity,
@@ -17,6 +19,8 @@ from custom_components.ecoflow_cloud.sensor import (
     CumulativeCapacitySensorEntity,
     CyclesSensorEntity,
     EnergySensorEntity,
+    FrequencySensorEntity,
+    MiscSensorEntity,
     InWattsSensorEntity,
     LevelSensorEntity,
     MilliVoltSensorEntity,
@@ -30,6 +34,38 @@ from custom_components.ecoflow_cloud.sensor import (
 )
 
 _LOGGER = logging.getLogger(__name__)
+
+
+# gridConnectionSta (field 619), same enum as BK_SERIES_PANEL_GRID_STA
+_GRID_STA = {
+    0: "no_valid",
+    1: "grid_in",
+    2: "not_online",
+    3: "feed_grid",
+}
+
+
+class StreamGridStateSensorEntity(MiscSensorEntity):
+    _attr_icon = "mdi:transmission-tower"
+
+    def _update_value(self, val: Any) -> bool:
+        return super()._update_value(_GRID_STA.get(int(val), f"unknown_{val}"))
+
+
+class StreamGridConnectedBinarySensorEntity(MiscBinarySensorEntity):
+    """On when the app would show the grid as present (GRID_IN / FEED_GRID)."""
+
+    _attr_device_class = BinarySensorDeviceClass.POWER
+
+    def _update_value(self, val: Any) -> bool:
+        try:
+            sta = int(val)
+        except (TypeError, ValueError):
+            return False
+        if sta not in _GRID_STA:
+            return False
+        self._attr_is_on = sta in (1, 3)
+        return True
 
 
 class StreamAC(BaseInternalDevice):
@@ -203,7 +239,10 @@ class StreamAC(BaseInternalDevice):
             WattsSensorEntity(client, self, "gridConnectionPower", const.STREAM_POWER_AC),
             # "gridConnectionSta": "PANEL_GRID_IN",
             # "gridConnectionVol": 235.34576,
-            MilliVoltSensorEntity(client, self, "gridConnectionVol", const.STREAM_POWER_VOL, False),
+            VoltSensorEntity(client, self, "gridConnectionVol", const.STREAM_POWER_VOL),
+            # "gridConnectionFreq" / "gridConnectionSta" (field 615 / 619)
+            FrequencySensorEntity(client, self, "gridConnectionFreq", const.STREAM_GRID_FREQ, False),
+            StreamGridStateSensorEntity(client, self, "gridConnectionSta", const.STREAM_GRID_STATE),
             # "gridSysDeviceCnt": 2,
             # "heatfilmNtcNum": 0,
             # "heatfilmTemp": [],
@@ -353,6 +392,13 @@ class StreamAC(BaseInternalDevice):
         ]
 
     # moduleWifiRssi
+    def binary_sensors(self, client: EcoflowApiClient) -> list[BinarySensorEntity]:
+        return [
+            StreamGridConnectedBinarySensorEntity(
+                client, self, "gridConnectionSta", const.STREAM_GRID_CONNECTED
+            ),
+        ]
+
     def numbers(self, client: EcoflowApiClient) -> list[NumberEntity]:
         return []
 
