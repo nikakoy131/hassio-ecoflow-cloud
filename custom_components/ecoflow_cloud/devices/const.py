@@ -433,6 +433,9 @@ STREAM_GRID_CONNECTION_STATUS = "Grid Connection Status"
 STREAM_WIFI_RSSI = "WiFi Signal Strength"
 STREAM_FEED_GRID_MODE_POW_LIMIT = "Feed-in Power Limit"
 STREAM_FEED_GRID_MODE_POW_MAX = "Feed-in Power Max"
+STREAM_GRID_STATE = "Grid Connection State"
+STREAM_GRID_CONNECTED = "Grid Connected"
+STREAM_GRID_FREQ = "Grid Frequency"
 
 # Stream AC 5000 (SN prefix "ES22", internal/App API)
 # >0 charging, <0 discharging -- opposite to STREAM_POWER_AC, hence its own name.
